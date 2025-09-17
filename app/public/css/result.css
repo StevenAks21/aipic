@@ -1,0 +1,47 @@
+.result-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: center;
+}
+
+.user-feedback {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-prediction {
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    gap: 40px;
+}
+
+img{
+    height: 300px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+
+.btn-yes {
+    background-color: #28a745; 
+}
+
+.btn-yes:hover {
+    background-color: #218838; 
+    box-shadow: 0px 5px 20px rgba(40, 167, 69, 0.75);
+}
+
+.btn-no {
+    background-color: #dc3545;
+}
+
+.btn-no:hover {
+    background-color: #c82333; 
+    box-shadow: 0px 5px 20px rgba(220, 53, 69, 0.75);
+}

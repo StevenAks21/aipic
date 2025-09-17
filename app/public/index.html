@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <title>AI Image Detector</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/public/css/root.css">
+        <link rel="stylesheet" href="/public/css/index.css">
+    </head>
+    <body>
+        <div class="container">
+            <h2>Upload an image to detect AI-generated or Real</h2>
+            </h2>
+            <form action="/detect" enctype="multipart/form-data" method="POST">
+                
+                <div class="drop-zone">
+                    <span class="drop-zone-prompt"><span style="font-weight: bold;">Click to upload</span> or drag and drop
+                    <br>
+                    <span style="font-size: 14px; margin-top: 10px;">PNG, JPG, JPEG, or image files only</span>
+                    
+                    </span>
+                    <input class="drop-zone-input" name="file" type="file" accept="image/*" required>
+                </div>
+                
+                <input class="detect-button" type="submit" value="DETECT">
+            </form>
+        </div>
+
+        <script src="/public/index.js"></script>
+        <script>
+            async function submitImage() {
+                const fileInput = document.getElementsByClassName('drop-zone-input')[0];
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+
+                await fetch('/detect', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Referer': window.location.href
+                    }
+                })
+            }
+        </script>
+
+    </body>
+</html>

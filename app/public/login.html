@@ -1,0 +1,52 @@
+<html>
+    <head>
+      <title>Login</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="/public/css/root.css">
+      <link rel="stylesheet" href="/public/css/login.css">
+    </head>
+    <body>
+      <div class="container">
+        <h2>Login</h2>
+        <form class="login-form" onsubmit="login(event)">
+            <label for="username">Username</label><br>
+            <input name="username" type="text" required><br>
+            <label for="password">Password</label><br>
+            <input name="password" type="password" required><br><br>
+            <input type="submit" value="Login" style="width: 100%;">
+        </form>
+      </div>
+    </body>
+
+    <script>
+      async function login(e){
+        e.preventDefault();
+
+        const form = e.target;
+        const username = form.username.value;
+        const password = form.password.value;
+
+        try {
+            const response = await fetch("/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username, password })
+            });
+
+            if (!response.ok) {
+            alert("Incorrect username or password.");
+            return;
+            }
+
+            window.location.href = "/";
+
+        } catch (err) {
+            console.error(err);
+            alert("An error occurred");
+        }
+      }
+    </script>
+</html>

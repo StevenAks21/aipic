@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <title>Admin's Dashboard</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/public/css/root.css">
+        <link rel="stylesheet" href="/public/css/admin.css">
+    </head>
+    <body>
+        <h2>All recent uploads</h2>
+
+         <div class="controls">
+            <label>
+                Username:
+                <input type="text" id="filterUsername" placeholder="Filter by user"/>
+            </label>
+
+            <label>
+                Prediction:
+                <select id="filterPrediction">
+                    <option value="">All</option>
+                    <option value="real">Real</option>
+                    <option value="ai-generated">AI-generated</option>
+                </select>
+            </label>
+
+            <label>
+                Sort by:
+                <select id="sortBy">
+                    <option value="uploaded_at">Upload date</option>
+                    <option value="filename">Filename</option>
+                    <option value="prediction">Prediction</option>
+                </select>
+            </label>
+
+            <label>
+                Order:
+                <select id="order">
+                    <option value="desc">Descending</option>
+                    <option value="asc">Ascending</option>
+                </select>
+            </label>
+
+            <button onclick="applyFilters()">Apply</button>
+        </div>
+
+        <div class="upload-list" id="uploadList"></div>
+
+        <div class="pagination">
+            <button id="prevPage" onclick="changePage(-1)">Previous</button>
+            <span id="pageInfo">Page 1</span>
+            <button id="nextPage" onclick="changePage(1)">Next</button>
+        </div>
+
+        <script>
+            let currentPage = 0;
+            const pageSize = 9;
+
+            async function loadUploads() {
+                const username = document.getElementById('filterUsername').value;
+                const prediction = document.getElementById('filterPrediction').value;
+                const sortBy = document.getElementById('sortBy').value;
+                const order = document.getElementById('order').value;
+
+                const offset = currentPage * pageSize;
+                const params = new URLSearchParams({
+                    limit: pageSize,
+                    offset,
+                    sort_by: sortBy,
+                    order,
+                });
+
+                if (username) params.append('username', username);
+                if (prediction) params.append('prediction', prediction);
+
+                const res = await fetch(`/admin/uploads?${params.toString()}`);
+                const data = await res.json();
+                const uploads = data
+
+                const uploadList = document.getElementById('uploadList');
+                uploadList.innerHTML = '';
+                uploads.forEach(img => {
+                    let user_prediction = "";
+                    if (img.user_prediction){
+                        user_prediction = `<span>User's prediction: ${img.user_prediction}</span>`;
+                    }
+
+                    const item = document.createElement('div');
+                    item.className = 'upload-item';
+                    item.innerHTML = `
+                        <img src="${img.image_url}" alt="Uploaded Image"/>
+                        <h3>Model's prediction: ${img.prediction}</h3>
+                        <span>Confidence: ${(img.confidence * 100).toFixed(1)}%</span>
+                        <span>Uploaded by: ${img.username}</span>
+                        ${user_prediction}
+                    `;
+                    uploadList.appendChild(item);
+                });
+
+                document.getElementById('pageInfo').textContent = `Page ${currentPage + 1}`;
+            }
+
+            function applyFilters() {
+                currentPage = 0;
+                loadUploads();
+            }
+
+            function changePage(delta) {
+                currentPage += delta;
+                if (currentPage < 0) currentPage = 0;
+                loadUploads();
+            }
+
+            window.onload = loadUploads;
+        </script>
+    </body>
+</html>

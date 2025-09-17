@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+pillow
+torch
+torchvision
+numpy
+opencv-python
+scikit-learn
+python-multipart
+PyJWT
+pydantic
+boto3
+python-dotenv
+decimal

@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <title>Image Detection Result</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/public/css/root.css">
+        <link rel="stylesheet" href="/public/css/result.css">
+    </head>
+    <body>
+        <div class="result-container">
+            <img src="{{ image_url }}" alt="Uploaded Image"/>
+            <h1>{{ prediction }}</h1>
+            <span>Confidence: {{ (confidence * 100) | round(1) }}%</span>
+
+            {% if user_prediction is none %}
+                <div id="user-feedback">
+                    <span>Is this prediction correct?</span>
+                    <div class="user-prediction">
+                        <button class="btn btn-yes" onclick="sendFeedback('{{ image_id }}', '{{ prediction }}', true)">Yes</button>
+                        <button class="btn btn-no" onclick="sendFeedback('{{ image_id }}', '{{ prediction }}', false)">No</button>
+                    </div>
+                </div>
+            {% else %}
+                <h3>Thanks for your feedback! You labelled the image as: <b>{{ user_prediction }}</b></h3>
+            {% endif %}
+            
+        </div>
+
+        <script>
+            async function sendFeedback(imageId, modelPrediction, userAgrees) {
+                const res = await fetch('/user/set_feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        image_id: imageId,
+                        model_prediction: modelPrediction,
+                        user_agrees: userAgrees
+                    })
+                });
+
+                const data = await res.json();
+                console.log(data);
+                if (data.status === "success"){
+                    const container = document.getElementById(`user-feedback`);
+                    container.innerHTML = `<h3>Thanks for your feedback! You labelled the image as: <b>${userAgrees ? modelPrediction : (modelPrediction === "Real" ? "AI-generated" : "Real")}</b></h3>`;
+                }
+                else alert("Could not save feedback. Please try again.");
+            }
+
+
+        </script>
+    </body>
+</html>

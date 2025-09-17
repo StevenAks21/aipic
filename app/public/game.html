@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AI vs Real Guessing Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/root.css">
+    <link rel="stylesheet" href="/public/css/game.css">
+</head>
+<body>
+    <h1>Guess if the image is Real or AI-generated</h1>
+    <div id="spinner">
+        <div class="loader"></div>
+    </div>
+
+    <img id="gameImage" src="" alt="Guess image">
+    <div>
+        <button onclick="makeGuess('real')">💁 Real</button>
+        <button onclick="makeGuess('ai')">🤖 AI</button>
+    </div>
+    <div id="score">Score: 0</div>
+
+    <script>
+        let user_id = null;
+        let currentAnswer = null;
+        let score = 0;
+
+        async function loadImage() {
+            const spinner = document.getElementById("spinner");
+            const img = document.getElementById("gameImage");
+
+            spinner.style.display = "flex"; 
+            img.style.opacity = 0.5; 
+
+            try {
+                const res = await fetch("/game/image");
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                currentAnswer = res.headers.get("answer");
+                if (!user_id) user_id = res.headers.get("user_id");
+
+                await new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.src = url;
+                });
+            } finally {
+                spinner.style.display = "none"; 
+                img.style.opacity = 1;
+            }
+        }
+
+        async function makeGuess(guess) {
+            if (guess === currentAnswer) {
+                score++;
+                document.getElementById('score').textContent = `Score: ${score}`;
+                loadImage();
+            } else {
+                alert(`Incorrect! Your final score is ${score}. Starting over.`);
+
+                const res = await fetch("/game/save_high_score", {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({high_score: score})
+                })
+                console.log(res.json());
+
+                score = 0;
+                document.getElementById('score').textContent = `Score: ${score}`;
+                loadImage(); 
+            }
+        }
+
+        window.onload = loadImage;
+    </script>
+</body>
+</html>

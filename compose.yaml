@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    container_name: ai-image-detector
+    env_file:
+      - .env
+    ports:
+      - "8080:8000"
+    volumes:
+    - ./app:/main
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    restart: always
